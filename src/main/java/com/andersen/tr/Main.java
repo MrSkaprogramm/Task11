@@ -33,14 +33,14 @@ public class Main {
 
         User user = userService.getUser();
 
-        //updateUserAndCreateTicket(user);
+        updateUserAndCreateTicket(user);
 
-        //saveTicket(user);
+        saveTicket(user);
         extractTicketData();
-        //deleteUser(user);
-        //deleteTicket(user);
-        //showTicket(user);
-        //updateTicket(user);
+        deleteUser(user);
+        deleteTicket(user);
+        showTicket(user);
+        updateTicket(user);
     }
 
     private void saveUser(){
