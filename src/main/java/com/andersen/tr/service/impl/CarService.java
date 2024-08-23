@@ -58,13 +58,12 @@ public class CarService implements CarServiceInterface {
         return car;
     }
 
-    @Transactional
     @Override
     public void deleteCar(Person person) {
         System.out.println("Which car you want to delete?");
         int carNum = scanner.nextInt();
         scanner.nextLine();
-        System.out.println(person.getCars().size());
+
         try {
             carDao.deleteCar(person.getCars().get(carNum));
         } catch (DaoException e) {

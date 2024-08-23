@@ -7,6 +7,10 @@ import com.andersen.tr.model.Person;
 import com.andersen.tr.model.TicketData;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -24,94 +28,68 @@ import java.util.List;
 
 @Repository
 public class CarDao implements CarDaoInterface {
-    private static final String INSERT_CAR_QUERY = "INSERT INTO \"Car\" (car_brand, car_type, release_date, person_id) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_CAR_QUERY = "UPDATE Car SET car_brand = ?, car_type = ?, release_date = ?, person_id = ? WHERE id = ?";
-    private static final String SELECT_CAR_BY_ID_QUERY = "SELECT * FROM Car WHERE id = ?";
-    private static final String CHECK_CAR_EXIST_QUERY = "SELECT COUNT(*) FROM Car WHERE id = ? AND person_id = ?";
-    private static final String DELETE_CAR_QUERY = "DELETE FROM Car WHERE id = ?";
-    private final DataSource dataSource;
+    private static final String SELECT_CAR_BY_ID_QUERY = "SELECT FROM Car WHERE id = :id AND person.id = :personId";
+    private static final String CHECK_CAR_EXIST_QUERY = "SELECT COUNT(*) FROM Car WHERE id = :ticketNum AND person.id = :userId";
 
-    public CarDao(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private final SessionFactory sessionFactory;
+
+    public CarDao(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
     public void saveCar(Car car) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT_CAR_QUERY)) {
-            statement.setString(1, car.getCarBrand());
-            statement.setObject(2, car.getCarType(), Types.OTHER);
-            statement.setDate(3, java.sql.Date.valueOf(car.getReleaseDate()));
-            statement.setInt(4, car.getPerson().getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            session.save(car);
+        } catch (Exception e) {
             throw new DaoException("Error saving car: " + e.getMessage());
         }
     }
 
     @Override
     public void updateCar(Car car) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_CAR_QUERY)) {
-            statement.setString(1, car.getCarBrand());
-            statement.setObject(2, car.getCarType(), Types.OTHER);
-            statement.setDate(3, java.sql.Date.valueOf(car.getReleaseDate()));
-            statement.setInt(4, car.getPerson().getId());
-            statement.setInt(5, car.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            session.update(car);
+        } catch (Exception e) {
             throw new DaoException("Error updating car: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteCar(Car car) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_CAR_QUERY)) {
-            statement.setInt(1, car.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
+        try (Session session = sessionFactory.openSession()) {
+            session.delete(car);
+        } catch (Exception e) {
             throw new DaoException("Error deleting car: " + e.getMessage());
         }
     }
 
     @Override
     public Car fetchCarById(int id, Person person) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_CAR_BY_ID_QUERY)) {
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                String ticketClass = resultSet.getString("car_brand");
-                CarType carType = CarType.valueOf(resultSet.getString("car_type"));
-                LocalDate startDate = resultSet.getDate("release_date").toLocalDate();
-                int userId = resultSet.getInt("person_id");
-
-                return new Car(id, ticketClass, carType, startDate, person);
+        try (Session session = sessionFactory.openSession()) {
+            Query<Car> query = session.createQuery(SELECT_CAR_BY_ID_QUERY, Car.class);
+            query.setParameter("id", id);
+            query.setParameter("personId", person.getId());
+            List<Car> cars = query.getResultList();
+            if (!cars.isEmpty()) {
+                return cars.get(0);
             } else {
                 throw new DaoException("Car not found: " + id);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DaoException("Error fetching car: " + e.getMessage());
         }
     }
 
     @Override
     public boolean checkCarExist(int ticketNum, int userId) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(CHECK_CAR_EXIST_QUERY)) {
-            statement.setInt(1, ticketNum);
-            statement.setInt(2, userId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt(1) > 0;
-                } else {
-                    return false;
-                }
-            }
-        } catch (SQLException e) {
-            throw new DaoException("Error checking if ticket exists", e);
+        try (Session session = sessionFactory.openSession()) {
+            Query<Long> query = session.createQuery(CHECK_CAR_EXIST_QUERY, Long.class);
+            query.setParameter("ticketNum", ticketNum);
+            query.setParameter("userId", userId);
+            return query.getSingleResult() > 0;
+        } catch (Exception e) {
+            throw new DaoException("Error checking if car exists", e);
         }
     }
 

@@ -3,8 +3,12 @@ package com.andersen.tr.config;
 import com.andersen.tr.Main;
 import com.andersen.tr.dao.impl.CarDao;
 import com.andersen.tr.dao.impl.PersonDao;
+import com.andersen.tr.model.Car;
+import com.andersen.tr.model.Person;
 import com.andersen.tr.service.impl.CarService;
 import com.andersen.tr.service.impl.PersonService;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,13 +52,13 @@ public class SpringConfig {
 
     @Bean
     public PersonService personService() {
-        PersonDao personDao = new PersonDao(dataSource(), new CarDao(dataSource()));
+        PersonDao personDao = new PersonDao(sessionFactory());
         return new PersonService(isUpdateEnabled, carService(), personDao);
     }
 
     @Bean
     public CarService carService() {
-        CarDao carDao = new CarDao(dataSource());
+        CarDao carDao = new CarDao(sessionFactory());
         return new CarService(carDao);
     }
 
@@ -78,5 +82,24 @@ public class SpringConfig {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
         transactionManager.setDataSource(dataSource);
         return transactionManager;
+    }
+
+    @Bean
+    public SessionFactory sessionFactory() {
+        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
+
+        configuration.setProperty("hibernate.connection.driver_class", connectionDriverClass);
+        configuration.setProperty("hibernate.connection.url", connectionUrl);
+        configuration.setProperty("hibernate.connection.username", connectionUsername);
+        configuration.setProperty("hibernate.connection.password", connectionPassword);
+        configuration.setProperty("hibernate.connection.pool_size", String.valueOf(poolSize));
+        configuration.setProperty("hibernate.dialect", hibernateDialect);
+        configuration.setProperty("hibernate.show_sql", hibernateShowSql);
+
+        configuration.addAnnotatedClass(Person.class);
+        configuration.addAnnotatedClass(Car.class);
+
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+        return configuration.buildSessionFactory(builder.build());
     }
 }

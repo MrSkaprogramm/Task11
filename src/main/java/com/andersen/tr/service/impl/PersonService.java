@@ -57,14 +57,11 @@ public class PersonService implements PersonServiceInterface {
             System.out.println("Person:" + "\n" + "- personId: " + person.getId() + "\n" + "- name: "
                     + person.getName() + "\n" + "- personStatus: " + person.getPersonStatus());
         } catch (DaoException e) {
-            //System.err.println(e.getMessage());
-            e.printStackTrace();
-            e.getCause();
+            System.err.println(e.getMessage());
         }
         return person;
     }
 
-    @Transactional
     @Override
     public void deletePerson(Person person) {
         try {
@@ -84,6 +81,7 @@ public class PersonService implements PersonServiceInterface {
         if (isUpdateEnabled) {
             try {
                 person.setPersonStatus(PersonStatus.ACTIVATED);
+                System.out.println(person.getPersonStatus());
                 Car car = carService.createCar(person);
                 personDao.updatePersonAndCar(person, car);
             } catch (DaoException e) {
@@ -91,7 +89,6 @@ public class PersonService implements PersonServiceInterface {
                 e.printStackTrace();
                 e.getCause();
             }
-
         } else {
             throw new IllegalArgumentException("You are not be able to do it!");
         }
