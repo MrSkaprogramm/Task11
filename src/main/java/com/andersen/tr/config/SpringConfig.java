@@ -1,10 +1,10 @@
 package com.andersen.tr.config;
 
 import com.andersen.tr.Main;
-import com.andersen.tr.dao.impl.TicketDao;
-import com.andersen.tr.dao.impl.UserDao;
-import com.andersen.tr.service.impl.TicketService;
-import com.andersen.tr.service.impl.UserService;
+import com.andersen.tr.dao.impl.CarDao;
+import com.andersen.tr.dao.impl.PersonDao;
+import com.andersen.tr.service.impl.CarService;
+import com.andersen.tr.service.impl.PersonService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -47,20 +47,20 @@ public class SpringConfig {
     private int poolSize;
 
     @Bean
-    public UserService userService() {
-        UserDao userDao = new UserDao(dataSource(), new TicketDao(dataSource()));
-        return new UserService(isUpdateEnabled, ticketService(), userDao);
+    public PersonService personService() {
+        PersonDao personDao = new PersonDao(dataSource(), new CarDao(dataSource()));
+        return new PersonService(isUpdateEnabled, carService(), personDao);
     }
 
     @Bean
-    public TicketService ticketService() {
-        TicketDao ticketDao = new TicketDao(dataSource());
-        return new TicketService(ticketDao);
+    public CarService carService() {
+        CarDao carDao = new CarDao(dataSource());
+        return new CarService(carDao);
     }
 
     @Bean
-    public Main main(TicketService ticketService, UserService userService) {
-        return new Main(ticketService, userService);
+    public Main main(CarService carService, PersonService personService) {
+        return new Main(carService, personService);
     }
 
     @Bean

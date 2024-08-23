@@ -1,23 +1,22 @@
 package com.andersen.tr;
 
 import com.andersen.tr.config.SpringConfig;
-import com.andersen.tr.model.User;
-import com.andersen.tr.service.impl.TicketService;
-import com.andersen.tr.service.impl.UserService;
+import com.andersen.tr.model.Person;
+import com.andersen.tr.service.impl.CarService;
+import com.andersen.tr.service.impl.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Component
 public class Main {
-    private final TicketService ticketService;
-    private final UserService userService;
+    private final CarService carService;
+    private final PersonService personService;
 
     @Autowired
-    public Main(TicketService ticketService, UserService userService) {
-        this.ticketService = ticketService;
-        this.userService = userService;
+    public Main(CarService carService, PersonService personService) {
+        this.carService = carService;
+        this.personService = personService;
     }
 
     public static void main(String[] args) {
@@ -29,59 +28,57 @@ public class Main {
 
     private void run(){
         System.out.println("Hello! You in Postgre SQL Demo App");
-        //saveUser();
+        savePerson();
 
-        User user = userService.getUser();
+        Person person = personService.getPerson();
 
-        updateUserAndCreateTicket(user);
+        updatePersonAndCreateCar(person);
 
-        saveTicket(user);
+        saveCar(person);
         extractTicketData();
-        deleteUser(user);
-        deleteTicket(user);
-        showTicket(user);
-        updateTicket(user);
+        deletePerson(person);
+        deleteCar(person);
+        showCar(person);
+        updateCar(person);
     }
 
-    private void saveUser(){
-            userService.saveUser();
+    private void savePerson(){
+            personService.savePerson();
     }
 
-    private void saveTicket(User user){
+    private void saveCar(Person person){
         for(int i = 0; i < 3; i++) {
-            ticketService.saveTicket(user);
+            carService.saveCar(person);
         }
     }
 
-    private void deleteUser(User user){
+    private void deletePerson(Person person){
 
-        userService.deleteUser(user);
+        personService.deletePerson(person);
     }
 
-    private void updateUserAndCreateTicket(User user){
+    private void updatePersonAndCreateCar(Person person){
 
-        userService.updateUserAndCreateTicket(user);
+        personService.updatePersonAndCreateCar(person);
     }
 
-    private void deleteTicket(User user){
+    private void deleteCar(Person person){
 
-        ticketService.deleteTicket(user);
+        carService.deleteCar(person);
     }
 
-    private void showTicket(User user){
+    private void showCar(Person person){
 
-        ticketService.showTicket(user);
+        carService.showCar(person);
     }
 
-    private void updateTicket(User user){
+    private void updateCar(Person person){
 
-        ticketService.updateTicket(user);
+        carService.updateCar(person);
     }
 
     private void extractTicketData(){
 
-        ticketService.extractTicketData();
+        carService.extractTicketData();
     }
-
-
 }

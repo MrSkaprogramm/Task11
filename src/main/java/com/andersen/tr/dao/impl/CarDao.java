@@ -1,10 +1,10 @@
 package com.andersen.tr.dao.impl;
-import com.andersen.tr.model.Ticket;
-import com.andersen.tr.dao.TicketDaoInterface;
+import com.andersen.tr.model.Car;
+import com.andersen.tr.dao.CarDaoInterface;
 import com.andersen.tr.dao.DaoException;
+import com.andersen.tr.model.CarType;
+import com.andersen.tr.model.Person;
 import com.andersen.tr.model.TicketData;
-import com.andersen.tr.model.TicketType;
-import com.andersen.tr.model.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -23,84 +23,84 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class TicketDao implements TicketDaoInterface {
-    private static final String INSERT_TICKET_QUERY = "INSERT INTO \"Ticket\" (ticket_class, ticket_type, start_date, user_id) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_TICKET_QUERY = "UPDATE Ticket SET ticket_class = ?, ticket_type = ?, start_date = ?, user_id = ? WHERE id = ?";
-    private static final String SELECT_TICKET_BY_ID_QUERY = "SELECT * FROM Ticket WHERE id = ?";
-    private static final String CHECK_TICKET_EXIST_QUERY = "SELECT COUNT(*) FROM Ticket WHERE id = ? AND user_id = ?";
-    private static final String DELETE_TICKET_QUERY = "DELETE FROM Ticket WHERE id = ?";
+public class CarDao implements CarDaoInterface {
+    private static final String INSERT_CAR_QUERY = "INSERT INTO \"Car\" (car_brand, car_type, release_date, person_id) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_CAR_QUERY = "UPDATE Car SET car_brand = ?, car_type = ?, release_date = ?, person_id = ? WHERE id = ?";
+    private static final String SELECT_CAR_BY_ID_QUERY = "SELECT * FROM Car WHERE id = ?";
+    private static final String CHECK_CAR_EXIST_QUERY = "SELECT COUNT(*) FROM Car WHERE id = ? AND person_id = ?";
+    private static final String DELETE_CAR_QUERY = "DELETE FROM Car WHERE id = ?";
     private final DataSource dataSource;
 
-    public TicketDao(DataSource dataSource) {
+    public CarDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public void saveTicket(Ticket ticket) throws DaoException {
+    public void saveCar(Car car) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT_TICKET_QUERY)) {
-            statement.setString(1, ticket.getTicketClass());
-            statement.setObject(2, ticket.getTicketType(), Types.OTHER);
-            statement.setDate(3, java.sql.Date.valueOf(ticket.getStartDate()));
-            statement.setInt(4, ticket.getUser().getId());
+             PreparedStatement statement = connection.prepareStatement(INSERT_CAR_QUERY)) {
+            statement.setString(1, car.getCarBrand());
+            statement.setObject(2, car.getCarType(), Types.OTHER);
+            statement.setDate(3, java.sql.Date.valueOf(car.getReleaseDate()));
+            statement.setInt(4, car.getPerson().getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException("Error saving ticket: " + e.getMessage());
+            throw new DaoException("Error saving car: " + e.getMessage());
         }
     }
 
     @Override
-    public void updateTicket(Ticket ticket) throws DaoException {
+    public void updateCar(Car car) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_TICKET_QUERY)) {
-            statement.setString(1, ticket.getTicketClass());
-            statement.setObject(2, ticket.getTicketType(), Types.OTHER);
-            statement.setDate(3, java.sql.Date.valueOf(ticket.getStartDate()));
-            statement.setInt(4, ticket.getUser().getId());
-            statement.setInt(5, ticket.getId());
+             PreparedStatement statement = connection.prepareStatement(UPDATE_CAR_QUERY)) {
+            statement.setString(1, car.getCarBrand());
+            statement.setObject(2, car.getCarType(), Types.OTHER);
+            statement.setDate(3, java.sql.Date.valueOf(car.getReleaseDate()));
+            statement.setInt(4, car.getPerson().getId());
+            statement.setInt(5, car.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException("Error updating ticket: " + e.getMessage());
+            throw new DaoException("Error updating car: " + e.getMessage());
         }
     }
 
     @Override
-    public void deleteTicket(Ticket ticket) throws DaoException {
+    public void deleteCar(Car car) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_TICKET_QUERY)) {
-            statement.setInt(1, ticket.getId());
+             PreparedStatement statement = connection.prepareStatement(DELETE_CAR_QUERY)) {
+            statement.setInt(1, car.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new DaoException("Error deleting ticket: " + e.getMessage());
+            throw new DaoException("Error deleting car: " + e.getMessage());
         }
     }
 
     @Override
-    public Ticket fetchTicketById(int id, User user) throws DaoException {
+    public Car fetchCarById(int id, Person person) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_TICKET_BY_ID_QUERY)) {
+             PreparedStatement statement = connection.prepareStatement(SELECT_CAR_BY_ID_QUERY)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                String ticketClass = resultSet.getString("ticket_class");
-                TicketType ticketType = TicketType.valueOf(resultSet.getString("ticket_type"));
-                LocalDate startDate = resultSet.getDate("start_date").toLocalDate();
-                int userId = resultSet.getInt("user_id");
+                String ticketClass = resultSet.getString("car_brand");
+                CarType carType = CarType.valueOf(resultSet.getString("car_type"));
+                LocalDate startDate = resultSet.getDate("release_date").toLocalDate();
+                int userId = resultSet.getInt("person_id");
 
-                return new Ticket(id, ticketClass, ticketType, startDate, user);
+                return new Car(id, ticketClass, carType, startDate, person);
             } else {
-                throw new DaoException("Ticket not found: " + id);
+                throw new DaoException("Car not found: " + id);
             }
         } catch (SQLException e) {
-            throw new DaoException("Error fetching ticket: " + e.getMessage());
+            throw new DaoException("Error fetching car: " + e.getMessage());
         }
     }
 
     @Override
-    public boolean checkTicketExist(int ticketNum, int userId) throws DaoException {
+    public boolean checkCarExist(int ticketNum, int userId) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(CHECK_TICKET_EXIST_QUERY)) {
+             PreparedStatement statement = connection.prepareStatement(CHECK_CAR_EXIST_QUERY)) {
             statement.setInt(1, ticketNum);
             statement.setInt(2, userId);
             try (ResultSet resultSet = statement.executeQuery()) {

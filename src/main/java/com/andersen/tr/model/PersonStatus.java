@@ -1,6 +1,6 @@
 package com.andersen.tr.model;
 
-public enum UserStatus {
+public enum PersonStatus {
     ACTIVATED,
     DEACTIVATED
 }
