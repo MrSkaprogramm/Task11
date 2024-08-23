@@ -48,8 +48,11 @@ public class CarDao implements CarDaoInterface {
 
     @Override
     public void updateCar(Car car) throws DaoException {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             session.update(car);
+            transaction.commit();
         } catch (Exception e) {
             throw new DaoException("Error updating car: " + e.getMessage());
         }
@@ -57,8 +60,11 @@ public class CarDao implements CarDaoInterface {
 
     @Override
     public void deleteCar(Car car) throws DaoException {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             session.delete(car);
+            transaction.commit();
         } catch (Exception e) {
             throw new DaoException("Error deleting car: " + e.getMessage());
         }

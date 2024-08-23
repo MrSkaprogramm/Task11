@@ -62,6 +62,7 @@ public class PersonService implements PersonServiceInterface {
         return person;
     }
 
+    @Transactional
     @Override
     public void deletePerson(Person person) {
         try {

@@ -36,8 +36,11 @@ public class PersonDao implements PersonDaoInterface {
 
     @Override
     public void deletePerson(Person person) throws DaoException {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             session.delete(person);
+            transaction.commit();
         } catch (Exception e) {
             throw new DaoException("Error deleting person", e);
         }

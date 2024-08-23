@@ -58,6 +58,7 @@ public class CarService implements CarServiceInterface {
         return car;
     }
 
+    @Transactional
     @Override
     public void deleteCar(Person person) {
         System.out.println("Which car you want to delete?");
@@ -111,7 +112,7 @@ public class CarService implements CarServiceInterface {
             if (!(carDao.checkCarExist(carNum, person.getId()))) {
                 throw new IllegalArgumentException("Wrong id!");
             } else {
-                Car car = person.getCars().get(carNum);
+                Car car = person.getCars().get(0);
                 car.setCarType(carType);
                 car.setCarBrand(ticketClassString);
                 carDao.updateCar(car);
