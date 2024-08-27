@@ -1,0 +1,17 @@
+{"ticketClass":"CLA","carType":"DAY","startDate":"2025-01-01","price":0}
+{"ticketClass":"CLA", "carType":"DAY", "startDate":"2025-01-01", "price":10}
+{"ticketClass":"CLA", "carType":"PRIME", "startDate": null, "price":1000}
+{"ticketClass":"STD", "carType":"DAY", "startDate":"2025-01-01", "price":0}
+{"ticketClass":"STD", "carType":"WEEK", "startDate":"2020-01-01", "price":50}
+{"ticketClass":"CLA", "carType":"YEAR", "startDate":"2020-01-01", "price":500}
+{"ticketClass":"CLA", "carType":"MONTH", "startDate":"2020-01-01", "price":100}
+{"ticketClass":"CLA", "carType":"DAY", "startDate":"2020-01-01", "price":100}
+{"ticketClass":null, "carType":"MONTH", "startDate":"2020-01-01", "price":100}
+{"ticketClass":"STD", "carType":"MONTH", "startDate":"2020-01-01", "price":100}
+{"ticketClass":"STD", "carType":null, "startDate":"2020-01-01", "price":1000}
+{"ticketClass":"STD", "carType":"YEAR", "startDate":"", "price":100}
+{"ticketClass":"CLA", "carType":"MONTH", "startDate":"2020-01-01", "price":99}
+{"ticketClass":"STD", "carType":"PRIME", "startDate":"2020-01-01", "price":0}
+{"ticketClass":"CLA", "carType":"YEAR", "startDate":null, "price":100}
+{"ticketClass":"STD", "carType":"DAY", "startDate":"2028-01-01", "price":100}
+{"ticketClass":"CLA", "carType":"DAY", "startDate":null, "price":null}
