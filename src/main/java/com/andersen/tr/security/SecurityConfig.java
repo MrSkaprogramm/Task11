@@ -15,13 +15,13 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/webapp/WEB-INF/view/login.html")
-                        .failureUrl("/WEB-INF/views/login?error=true")
+                        .loginPage("/login")
+                        .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/webapp/WEB-INF/view/login.html")
+                        .logoutSuccessUrl("/login.html")
                         .permitAll()
                 )
                 .csrf().disable();
