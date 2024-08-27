@@ -25,11 +25,5 @@ public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
 
-        /*AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.register(SecurityConfig.class, SpringConfig.class, CustomConfiguration.class);
-        context.refresh();
-
-        Main main = context.getBean(Main.class);
-        main.run();*/
     }
 }
