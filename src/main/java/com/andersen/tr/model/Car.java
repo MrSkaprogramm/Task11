@@ -17,11 +17,11 @@ public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "car_brand", nullable = false)
-    private String carBrand;
-    @Column(name = "car_type", nullable = false)
+    @Column(name = "brand", nullable = false)
+    private String brand;
+    @Column(name = "type", nullable = false)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private CarType carType;
+    private CarType type;
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
@@ -31,17 +31,23 @@ public class Car {
 
     public Car() {}
 
-    public Car(String carBrand, CarType carType, LocalDate releaseDate, BigDecimal price, Person person) {
-        this.carBrand = carBrand;
-        this.carType = carType;
-        this.releaseDate = releaseDate;
-        this.person = person;
+    public Car(int id, String brand, CarType type) {
+        this.id = id;
+        this.brand = brand;
+        this.type = type;
     }
 
-    public Car(int id, String carBrand, CarType carType, LocalDate releaseDate, Person person) {
+    public Car(String brand, CarType type, LocalDate releaseDate, int id) {
+        this.brand = brand;
+        this.type = type;
+        this.releaseDate = releaseDate;
         this.id = id;
-        this.carBrand = carBrand;
-        this.carType = carType;
+    }
+
+    public Car(int id, String brand, CarType type, LocalDate releaseDate, Person person) {
+        this.id = id;
+        this.brand = brand;
+        this.type = type;
         this.releaseDate = releaseDate;
         this.person = person;
     }

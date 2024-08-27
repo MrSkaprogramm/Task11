@@ -1,11 +1,16 @@
 package com.andersen.tr.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
 public class TicketData {
+    @Id
+    private int id;
     private String ticketClass;
     private String ticketType;
     private String startDate;
