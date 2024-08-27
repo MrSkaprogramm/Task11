@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E shop user register</title>
+    <link href="style.css" rel="stylesheet" />
+    <link href="css/glider.min.css" rel="stylesheet" />
+</head>
+
+<body>
+
+        <header>
+        </header>
+
+    <h2>Registration</h2>
+
+    <div id="registration">
+        <form action="/E-Shop-Sfia/controller" method="post">
+            <input type="hidden" class="input-info-in" name="command" value="registration"/>
+            <h3>Введите логин:</h3>
+            <input type="text" class="input-info-in" name="login" value=""/>
+            <h3>Введите пароль:</h3>
+            <input type="password" class="input-info-in" name="pass" value=""/>
+            <h3>Введите фамилию, имя и отчество:</h3>
+            <input type="text" class="input-info-in" name="fio" value=""/>
+            <h3>Введите e-mail:</h3>
+            <input type="text" class="input-info-in" name="email" value=""/>
+            <h3>Введите адрес доставки:</h3>
+            <input type="text" class="input-info-in" name="address" value=""/>
+            <h3>Выберите тип аккаунта пользователя:</h3>
+            <select name="role">
+                <option value="1">Клиент</option>
+                <option value="2">Админ</option>
+            </select>
+            <br>
+            <br>
+            <input type="submit" class="cart-btn" value="Зарегистрироваться"/>
+        </form>
+    </div>
+
+        <div class="footer-nav">
+        </div>
+</body>
+</html>
