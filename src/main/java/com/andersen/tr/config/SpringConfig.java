@@ -1,31 +1,35 @@
 package com.andersen.tr.config;
 
-import com.andersen.tr.Main;
-import com.andersen.tr.dao.impl.CarDao;
-import com.andersen.tr.dao.impl.PersonDao;
-import com.andersen.tr.model.Car;
-import com.andersen.tr.model.Person;
+import com.andersen.tr.repository.CarRepository;
+import com.andersen.tr.repository.PersonRepository;
+import com.andersen.tr.repository.TicketDataRepository;
 import com.andersen.tr.service.impl.CarService;
 import com.andersen.tr.service.impl.PersonService;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import com.andersen.tr.service.impl.TicketDataService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
-@ComponentScan(basePackages = {"com.andersen.tr.dao", "com.andersen.tr.model", "com.andersen.tr.service", "com.andersen.tr"})
+@EnableWebMvc
+@ComponentScan(basePackages = {"com.andersen.tr.repository", "com.andersen.tr.model", "com.andersen.tr.service", "com.andersen.tr"})
 @PropertySource("classpath:application.properties")
 @EnableTransactionManagement(proxyTargetClass = true)
-public class SpringConfig {
+@EnableJpaRepositories(basePackages = "com.andersen.tr.repository",
+        entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef="transactionManager")
+public class SpringConfig implements WebMvcConfigurer {
     @Value("${entity.update.enabled}")
     boolean isUpdateEnabled;
 
@@ -51,20 +55,34 @@ public class SpringConfig {
     private int poolSize;
 
     @Bean
-    public PersonService personService() {
-        PersonDao personDao = new PersonDao(sessionFactory());
-        return new PersonService(isUpdateEnabled, carService(), personDao);
+    public PersonService personService(PersonRepository personRepository, CarRepository carRepository, String conditionalBean) {
+        return new PersonService(isUpdateEnabled, carService(carRepository, conditionalBean), personRepository, carRepository);
     }
 
     @Bean
-    public CarService carService() {
-        CarDao carDao = new CarDao(sessionFactory());
-        return new CarService(carDao);
+    public CarService carService(CarRepository carRepository, String conditionalBean) {
+        return new CarService(carRepository, conditionalBean);
     }
 
     @Bean
-    public Main main(CarService carService, PersonService personService) {
-        return new Main(carService, personService);
+    public TicketDataService ticketDataService(TicketDataRepository ticketDataRepository) {
+        return new TicketDataService(ticketDataRepository);
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+
+        factory.setDataSource(dataSource()); // обновленная строка
+        factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        factory.setPackagesToScan("com.andersen.tr.model");
+
+        Properties jpaProperties = new Properties();
+        jpaProperties.put("hibernate.dialect", hibernateDialect);
+        jpaProperties.put("hibernate.show_sql", hibernateShowSql);
+        jpaProperties.put("hibernate.hbm2ddl.auto", "update");
+        factory.setJpaProperties(jpaProperties);
+        return factory;
     }
 
     @Bean
@@ -79,27 +97,9 @@ public class SpringConfig {
 
     @Bean
     public PlatformTransactionManager transactionManager(DataSource dataSource) {
-        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
-        transactionManager.setDataSource(dataSource);
-        return transactionManager;
-    }
-
-    @Bean
-    public SessionFactory sessionFactory() {
-        org.hibernate.cfg.Configuration configuration = new org.hibernate.cfg.Configuration();
-
-        configuration.setProperty("hibernate.connection.driver_class", connectionDriverClass);
-        configuration.setProperty("hibernate.connection.url", connectionUrl);
-        configuration.setProperty("hibernate.connection.username", connectionUsername);
-        configuration.setProperty("hibernate.connection.password", connectionPassword);
-        configuration.setProperty("hibernate.connection.pool_size", String.valueOf(poolSize));
-        configuration.setProperty("hibernate.dialect", hibernateDialect);
-        configuration.setProperty("hibernate.show_sql", hibernateShowSql);
-
-        configuration.addAnnotatedClass(Person.class);
-        configuration.addAnnotatedClass(Car.class);
-
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-        return configuration.buildSessionFactory(builder.build());
+        JpaTransactionManager tm = new JpaTransactionManager();
+        tm.setEntityManagerFactory(entityManagerFactory().getObject());
+        return tm;
     }
 }
+

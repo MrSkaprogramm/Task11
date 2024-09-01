@@ -11,14 +11,12 @@ public interface CarServiceInterface {
 
     public Car saveCar(Person person);
 
-    public void deleteCar(Person person);
+    public String deleteCar(Person person);
 
-    public void showCar(Person person);
+    public Car showCar(Person person);
 
-    public void updateCar(Person person);
+    public Car updateCar(Person person);
 
     public LocalDate detectCarReleaseTime();
-
-    public void extractTicketData();
 
 }

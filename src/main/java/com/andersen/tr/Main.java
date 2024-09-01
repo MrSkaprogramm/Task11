@@ -1,84 +1,28 @@
 package com.andersen.tr;
 
-import com.andersen.tr.config.SpringConfig;
-import com.andersen.tr.model.Person;
 import com.andersen.tr.service.impl.CarService;
 import com.andersen.tr.service.impl.PersonService;
+import com.andersen.tr.service.impl.TicketDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
-@Component
+@SpringBootApplication
 public class Main {
     private final CarService carService;
     private final PersonService personService;
+    private final TicketDataService ticketDataService;
 
     @Autowired
-    public Main(CarService carService, PersonService personService) {
+    public Main(CarService carService, PersonService personService, TicketDataService ticketDataService) {
         this.carService = carService;
         this.personService = personService;
+        this.ticketDataService = ticketDataService;
     }
 
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
+        SpringApplication.run(Main.class, args);
 
-        Main main = context.getBean(Main.class);
-        main.run();
-    }
-
-    private void run(){
-        System.out.println("Hello! You in Postgre SQL Demo App");
-        savePerson();
-
-        Person person = personService.getPerson();
-
-        updatePersonAndCreateCar(person);
-
-        saveCar(person);
-        extractTicketData();
-        deletePerson(person);
-        deleteCar(person);
-        showCar(person);
-        updateCar(person);
-    }
-
-    private void savePerson(){
-            personService.savePerson();
-    }
-
-    private void saveCar(Person person){
-        for(int i = 0; i < 3; i++) {
-            carService.saveCar(person);
-        }
-    }
-
-    private void deletePerson(Person person){
-
-        personService.deletePerson(person);
-    }
-
-    private void updatePersonAndCreateCar(Person person){
-
-        personService.updatePersonAndCreateCar(person);
-    }
-
-    private void deleteCar(Person person){
-
-        carService.deleteCar(person);
-    }
-
-    private void showCar(Person person){
-
-        carService.showCar(person);
-    }
-
-    private void updateCar(Person person){
-
-        carService.updateCar(person);
-    }
-
-    private void extractTicketData(){
-
-        carService.extractTicketData();
     }
 }

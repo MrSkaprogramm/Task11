@@ -19,9 +19,11 @@ public class Person {
     private int id;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "person_status", nullable = false)
+    @Column(name = "status", nullable = false)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private PersonStatus personStatus;
+    private PersonStatus status;
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Car> cars = new ArrayList<>();
@@ -29,14 +31,16 @@ public class Person {
     public Person() {
     }
 
-    public Person(String name, PersonStatus personStatus) {
+    public Person(String name, PersonStatus status, String password) {
         this.name = name;
-        this.personStatus = personStatus;
+        this.status = status;
+        this.password = password;
     }
 
-    public Person(int id, String name, PersonStatus personStatus) {
+    public Person(int id, String name, PersonStatus status, String password) {
         this.id = id;
         this.name = name;
-        this.personStatus = personStatus;
+        this.status = status;
+        this.password = password;
     }
 }

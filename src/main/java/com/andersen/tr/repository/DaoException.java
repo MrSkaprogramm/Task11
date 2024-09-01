@@ -1,4 +1,4 @@
-package com.andersen.tr.dao;
+package com.andersen.tr.repository;
 
 public class DaoException extends Exception {
 
