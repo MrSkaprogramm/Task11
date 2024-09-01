@@ -40,7 +40,7 @@ public class CreateCarTest {
 
     @ParameterizedTest
     @MethodSource("providerPositiveTest")
-    public void positiveTest(String brand, CarType type, LocalDate releaseDate, Person person) {
+    public void positiveTest(String brand, CarType type, Person person) {
         Car car = carService.createCar(person, type, brand);
 
         assertNotNull(car, "Car object should be created");
