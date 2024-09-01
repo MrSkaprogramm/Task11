@@ -10,13 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 @Service
 public class CarService implements CarServiceInterface {
-    static Scanner scanner = new Scanner(System.in);
-
     private final CarRepository carRepository;
     private final String conditionalBean;
 
@@ -27,20 +25,15 @@ public class CarService implements CarServiceInterface {
     }
 
     @Override
-    public Car createCar(Person person) {
-        if (conditionalBean != null) {
-            System.out.println(conditionalBean);
+    public Car createCar(Person person, CarType carType, String carBrandString) {
+        if (person == null || carType == null || carBrandString == null || carBrandString.isEmpty()) {
+            throw new IllegalArgumentException();
         }
 
-        System.out.println("Enter car type:");
-        String typeString = scanner.nextLine();
-        CarType carType = CarType.valueOf(typeString.toUpperCase());
-        System.out.println("Enter car class:");
-        String carBrandString = scanner.nextLine();
         LocalDate creationDate = detectCarReleaseTime();
 
         Car car = new Car();
-        car.setBrand(carBrandString);
+        car.setBrand(carBrandString.trim());
         car.setType(carType);
         car.setReleaseDate(creationDate);
         car.setPerson(person);
@@ -49,69 +42,65 @@ public class CarService implements CarServiceInterface {
     }
 
     @Override
-    public Car saveCar(Person person) {
-        Car car = createCar(person);
+    public Car saveCar(Person person, CarType carType, String carBrandString) {
+        if (person == null || carType == null || carBrandString == null || carBrandString.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        Car car = createCar(person, carType, carBrandString);
         car = carRepository.save(car);
         return car;
     }
 
     @Transactional
     @Override
-    public String deleteCar(Person person) {
-        System.out.println("Which car you want to delete?");
-        int carNum = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println(carNum);
-        carRepository.deleteById(carNum);
-        return "Car deleted";
+    public String deleteCar(int carId) {
+        Optional<Car> car = carRepository.findById(carId);
+        if (car.isPresent()) {
+            carRepository.deleteById(carId);
+            return "Car deleted";
+        }
+        return "Car not found";
     }
 
     @Override
-    public Car showCar(Person person) {
-        System.out.println("Enter number of car:");
-        int carNum = scanner.nextInt();
-        scanner.nextLine();
-
+    public Car showCar(int carNum) {
         Car car = null;
         Optional<Car> optionalCar = carRepository.findById(carNum);
         if (optionalCar.isPresent()) {
             car = optionalCar.get();
         } else {
-            throw new IllegalArgumentException("Пользователь не найден");
+            throw new IllegalArgumentException("Car not found");
         }
         return car;
     }
 
     @Transactional
     @Override
-    public Car updateCar(Person person) {
-        System.out.println("Enter number of car:");
-        int carNum = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.println("Enter car class:");
-        String carBrand = scanner.nextLine().toUpperCase();
-
-        System.out.println("Enter type of car:");
-        String type = scanner.nextLine();
-        CarType carType = CarType.valueOf(type.toUpperCase());
-
-        Car car;
+    public Car updateCar(int carNum, String carBrand, CarType carType) {
         Optional<Car> optionalCar = carRepository.findById(carNum);
         if (optionalCar.isPresent()) {
-            car = optionalCar.get();
+            Car car = optionalCar.get();
+            car.setId(carNum);
+            if (carBrand != null) {
+                car.setBrand(carBrand.trim());
+            }
+            car.setType(carType);
+            return carRepository.save(car);
         } else {
-            throw new IllegalArgumentException("Пользователь не найден");
+            throw new IllegalArgumentException("Car not found");
         }
+    }
 
-        car.setBrand(carBrand);
-        car.setType(carType);
-
-        System.out.println(car.getId());
-
-        car = carRepository.save(car);
-
-        return car;
+    @Override
+    public Car getPersonCar(Person person) {
+            List<Car> cars = person.getCars();
+            if (!cars.isEmpty()) {
+                Car car = cars.get(0);
+                return car;
+            } else {
+                throw new IllegalArgumentException("The user does not have a car");
+            }
     }
 
     @Override

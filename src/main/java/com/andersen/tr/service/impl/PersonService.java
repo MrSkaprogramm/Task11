@@ -1,5 +1,6 @@
 package com.andersen.tr.service.impl;
 
+import com.andersen.tr.model.CarType;
 import com.andersen.tr.repository.CarRepository;
 import com.andersen.tr.repository.PersonRepository;
 import com.andersen.tr.model.Car;
@@ -10,13 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 @Service
 public class PersonService implements PersonServiceInterface {
-    static Scanner scanner = new Scanner(System.in);
     private final boolean isUpdateEnabled;
     private final CarService carService;
     private final PersonRepository personRepository;
@@ -32,11 +30,7 @@ public class PersonService implements PersonServiceInterface {
 
     @Transactional
     @Override
-    public Person savePerson() {
-        System.out.println("Enter person name:");
-        String name = scanner.nextLine();
-        PersonStatus personStatus = PersonStatus.DEACTIVATED;
-        String password = "1234";
+    public Person savePerson(String name, PersonStatus personStatus, String password) {
         Person person = new Person(name, personStatus, password);
 
         person = personRepository.save(person);
@@ -46,20 +40,14 @@ public class PersonService implements PersonServiceInterface {
     }
 
     @Override
-    public Person getPerson() {
-        System.out.println("Enter person id:");
-        int userId = scanner.nextInt();
-        scanner.nextLine();
-
+    public Person getPerson(int personId) {
         Person person = null;
-        Optional<Person> optionalPerson = personRepository.findById(userId);
+        Optional<Person> optionalPerson = personRepository.findById(personId);
         if (optionalPerson.isPresent()) {
             person = optionalPerson.get();
         } else {
-            throw new IllegalArgumentException("Пользователь не найден");
+            throw new IllegalArgumentException("User not found");
         }
-        System.out.println("Person:" + "\n" + "- personId: " + person.getId() + "\n" + "- name: "
-                + person.getName() + "\n" + "- personStatus: " + person.getStatus());
         return person;
     }
 
@@ -72,33 +60,15 @@ public class PersonService implements PersonServiceInterface {
 
     @Transactional
     @Override
-    public String updatePersonAndCreateCar(Person person) {
-        person.setStatus(PersonStatus.ACTIVATED);
-        person = personRepository.save(person);
-        Car car = carService.createCar(person);
-        car = carRepository.save(car);
-        return "Person: " + person.toString() + "car: " + car.toString();
-    }
-
-    @Override
-    public Car getSingleCar() {
-        System.out.println("Enter person id:");
-        int userId = scanner.nextInt();
-        scanner.nextLine();
-
-        Optional<Person> optionalPerson = personRepository.findById(userId);
-        if (optionalPerson.isPresent()) {
-            Person person = optionalPerson.get();
-            List<Car> cars = person.getCars();
-            if (!cars.isEmpty()) {
-                Car car = cars.get(0);
-                System.out.println("Car:" + "\n" + "- carId: " + car.getId() + "\n" + "- make: " + car.getBrand() + "\n" + "- model: " + car.getType());
-                return car;
-            } else {
-                throw new IllegalArgumentException("The user does not have a car");
-            }
+    public String updatePersonAndCreateCar(Person person, CarType carType, String carBrandString) {
+        if (isUpdateEnabled) {
+            person.setStatus(PersonStatus.ACTIVATED);
+            person = personRepository.save(person);
+            Car car = carService.createCar(person, carType, carBrandString);
+            car = carRepository.save(car);
+            return "Person: " + person.toString() + "car: " + car.toString();
         } else {
-            throw new IllegalArgumentException("Person not found");
+            throw new IllegalArgumentException("You are not be able to do it!");
         }
     }
 }

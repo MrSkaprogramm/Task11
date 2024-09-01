@@ -10,16 +10,6 @@ import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 public class Main {
-    private final CarService carService;
-    private final PersonService personService;
-    private final TicketDataService ticketDataService;
-
-    @Autowired
-    public Main(CarService carService, PersonService personService, TicketDataService ticketDataService) {
-        this.carService = carService;
-        this.personService = personService;
-        this.ticketDataService = ticketDataService;
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
