@@ -15,6 +15,7 @@
 
         <spring.version>6.1.12</spring.version>
         <spring.extra>3.3.3</spring.extra>
+        <test.version>5.4.0</test.version>
     </properties>
 
     <dependencies>
@@ -148,6 +149,28 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
             <version>6.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${test.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${test.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
